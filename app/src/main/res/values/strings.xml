@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">Visit Somerset</string>
+    
+    <string name="wells">Wells Cathedral</string>
+    <string name="wells_description">Wells Cathedral, formally the Cathedral Church of St Andrew, is a Church of England cathedral in Wells, Somerset, England. It is the seat of the bishop of Bath and Wells and the mother church of the diocese of Bath and Wells.</string>
+    <string name="wells_img_author">David Iliff</string>
+    <string name="wells_img_license">CC BY-SA 3.0</string>
+
+    
+    <string name="roman">Roman Baths</string>
+    <string name="roman_description">The Roman Baths are well-preserved thermae in the city of Bath, Somerset, England. A temple was constructed on the site between 60 and 70 AD in the first few decades of Roman Britain. Its presence led to the development of the small Roman urban settlement known as Aquae Sulis around the site</string>
+    <string name="roman_img_author">Diego Delso</string>
+    <string name="roman_img_license">CC BY-SA 4.0</string>
+    
+    <string name="bridgwater">Bridgwater Carnival</string>
+    <string name="bridgwater_description">Bridgwater Guy Fawkes Carnival – the UK\’s oldest carnival and one of the largest illuminated carnival processions in Europe. Held annually on the first Saturday in November, this carnival takes place in Bridgwater, Somerset. The entire procession takes over two hours to pass anyone viewing point on the 1.7-mile route and the carnival is brought to a dramatic finale with an amazing firework display (locally known as squibbing) in the middle of the town.</string>
+    <string name="bridgwater_img_author">Roger Cornfoot</string>
+    <string name="bridgwater_img_license">CC BY-SA 2.0</string>
+
+    <string name="cheddar">Cheddar Gorge</string>
+    <string name="cheddar_description">Cheddar Gorge is a limestone gorge in the Mendip Hills, near the village of Cheddar, Somerset, England. The gorge is the site of the Cheddar show caves, where Britain\'s oldest complete human skeleton, Cheddar Man, estimated to be 9,000 years old, was found in 1903.</string>
+    <string name="cheddar_img_author">Colin Smith</string>
+    <string name="cheddar_img_license">CC BY-SA 2.0</string>
+
+    <string name="glastonbury">Glastonbury Tor</string>
+    <string name="glastonbury_description">Glastonbury Tor is a tor near Glastonbury in the English county of Somerset, topped by the roofless St Michael\'s Tower, a Grade I listed building. The site is managed by the National Trust and has been designated a scheduled monument.</string>
+    <string name="glastonbury_img_author">Mundo Salvaje Media</string>
+    <string name="glastonbury_img_license">CC BY-SA 4.0</string>
 </resources>
