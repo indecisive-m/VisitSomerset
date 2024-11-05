@@ -1,10 +1,11 @@
 package com.example.visitsomerset.data
 
-import androidx.compose.ui.res.stringResource
 import com.example.visitsomerset.R
 import com.example.visitsomerset.model.Attraction
 
 object LocalAttractionsData {
+
+    val firstAttraction = getListOfAttractions()[1]
 
     fun getListOfAttractions(): List<Attraction> {
         return listOf(
