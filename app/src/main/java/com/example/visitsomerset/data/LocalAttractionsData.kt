@@ -5,7 +5,7 @@ import com.example.visitsomerset.model.Attraction
 
 object LocalAttractionsData {
 
-    val firstAttraction = getListOfAttractions()[1]
+    val firstAttraction = getListOfAttractions()[0]
 
     fun getListOfAttractions(): List<Attraction> {
         return listOf(

@@ -7,10 +7,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.visitsomerset.data.LocalAttractionsData
+import com.example.visitsomerset.ui.AttractionListScreen
 import com.example.visitsomerset.ui.theme.VisitSomersetTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,8 +20,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VisitSomersetTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Text(text = "hello", modifier = Modifier.padding(innerPadding))
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+
+                ) { innerPadding ->
+                    AttractionListScreen(
+                        attractionList = LocalAttractionsData.getListOfAttractions(),
+                        modifier = Modifier
+                            .padding(innerPadding)
+                    )
 
                 }
             }
@@ -29,11 +38,10 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     VisitSomersetTheme {
-        Text("hello")
+
     }
 }
