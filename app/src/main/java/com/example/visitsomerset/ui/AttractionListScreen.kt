@@ -13,11 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -32,9 +35,11 @@ import com.example.visitsomerset.model.Attraction
 import com.example.visitsomerset.ui.theme.PurpleGrey80
 import com.example.visitsomerset.ui.theme.VisitSomersetTheme
 
+
 @Composable
 fun AttractionListScreen(
     attractionList: List<Attraction>,
+    focussedAttraction: Attraction,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -109,18 +114,106 @@ fun AttractionListItem(
 }
 
 
-@Preview(showBackground = true)
 @Composable
-fun AttractionListScreenPreview() {
-    VisitSomersetTheme {
-        AttractionListScreen(LocalAttractionsData.getListOfAttractions())
+fun AttractionDetails(
+    focussedAttraction: Attraction,
+    isListView: Boolean,
+    modifier: Modifier = Modifier
+) {
+
+    if (isListView) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            Image(
+                painter = painterResource(focussedAttraction.img),
+                contentDescription = stringResource(focussedAttraction.name),
+                contentScale = ContentScale.Inside
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = stringResource(focussedAttraction.name),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(focussedAttraction.description),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
+
+            )
+        }
+    } else {
+        return AttractionDetailsLarge(
+            focussedAttraction = focussedAttraction,
+            modifier = modifier
+        )
+    }
+
+}
+
+@Composable
+fun AttractionDetailsLarge(
+    focussedAttraction: Attraction,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(focussedAttraction.img),
+            contentDescription = stringResource(focussedAttraction.name),
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(Modifier.height(12.dp))
+        Column(modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            Text(
+                text = stringResource(focussedAttraction.name),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(focussedAttraction.description),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
+
+            )
+
+        }
     }
 }
 
+//@Preview(showBackground = true)
+//@Composable
+//fun AttractionListScreenPreview() {
+//    VisitSomersetTheme {
+//        AttractionListScreen(
+//            LocalAttractionsData.getListOfAttractions(),
+//            focussedAttraction = LocalAttractionsData.firstAttraction
+//        )
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun AttractionListItemPreview() {
+//    VisitSomersetTheme {
+//        AttractionListItem(LocalAttractionsData.firstAttraction)
+//    }
+//}
+
 @Preview(showBackground = true)
 @Composable
-fun AttractionListItemPreview() {
+fun AttractionDetailsPreview() {
     VisitSomersetTheme {
-        AttractionListItem(LocalAttractionsData.firstAttraction)
+        AttractionDetails(LocalAttractionsData.firstAttraction, isListView = true)
     }
 }
