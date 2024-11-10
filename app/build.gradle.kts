@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.visitsomerset"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.visitsomerset"
@@ -50,6 +50,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.window:window:1.3.0")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.1.0-alpha06")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
