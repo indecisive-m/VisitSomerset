@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,25 +46,40 @@ fun AttractionList(
     contentLayout: AttractionLayout,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(
-                horizontal = 12.dp,
-                vertical = 12.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(attractionList) { attraction ->
 
-            if (contentLayout == AttractionLayout.HORIZONTAL) {
-                AttractionListItemLargeScreens(
+    if (contentLayout == AttractionLayout.VERTICAL) {
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 12.dp
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(attractionList) { attraction ->
+                AttractionListItemSmallScreens(
                     attraction = attraction,
                     focussedAttraction = focussedAttraction,
                     onClick = {},
                 )
-            } else {
-                AttractionListItemSmallScreens(
+            }
+        }
+    } else {
+        LazyVerticalStaggeredGrid(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(
+                    horizontal = 12.dp,
+                    vertical = 12.dp
+                ),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalItemSpacing = 12.dp,
+            columns = StaggeredGridCells.Fixed(2)
+        ) {
+            items(attractionList) { attraction ->
+
+                AttractionListItemLargeScreens(
                     attraction = attraction,
                     focussedAttraction = focussedAttraction,
                     onClick = {},
@@ -83,6 +101,7 @@ fun AttractionListItemSmallScreens(
 
     val height = 180.dp
 
+
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
@@ -98,9 +117,9 @@ fun AttractionListItemSmallScreens(
                 contentDescription = stringResource(attraction.name),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
+                    .weight(1f)
                     .height(height)
                     .width(height)
-                    .weight(1f)
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(
@@ -138,35 +157,39 @@ fun AttractionListItemLargeScreens(
     modifier: Modifier = Modifier,
 ) {
 
-    val height = 180.dp
-    
+    val height = 300.dp
+
     Card(modifier = modifier) {
-        Column(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(if (attraction == focussedAttraction) Purple40 else Purple80)
+        ) {
             Image(
                 painter = painterResource(attraction.img),
                 contentDescription = stringResource(attraction.name),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.Inside,
                 modifier = Modifier
-                    .height(height)
-                    .width(height)
-                    .weight(1f)
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(attraction.name),
                 style = MaterialTheme.typography.titleLarge,
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
-                color = if (attraction == focussedAttraction) Color.White else Color.Black
+                color = if (attraction == focussedAttraction) Color.White else Color.Black,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(attraction.description),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                color = if (attraction == focussedAttraction) Color.White else Color.Black
+                color = if (attraction == focussedAttraction) Color.White else Color.Black,
+                modifier = Modifier.padding(16.dp)
 
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
 }
