@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("androidx.window:window:1.3.0")
     implementation("androidx.compose.material3.adaptive:adaptive:1.1.0-alpha06")
+    implementation("androidx.navigation:navigation-compose:2.7.4")
+
 
 
 

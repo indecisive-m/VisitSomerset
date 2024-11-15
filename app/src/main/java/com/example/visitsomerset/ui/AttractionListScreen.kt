@@ -1,5 +1,6 @@
 package com.example.visitsomerset.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,14 +17,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -32,18 +37,111 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.WindowWidthSizeClass
+import com.example.visitsomerset.R
+import com.example.visitsomerset.data.LocalAttractionsData
 import com.example.visitsomerset.model.Attraction
-import com.example.visitsomerset.ui.theme.Purple40
 import com.example.visitsomerset.ui.theme.Purple80
+import com.example.visitsomerset.ui.theme.VisitSomersetTheme
 import com.example.visitsomerset.utils.AttractionLayout
 
+
+enum class AttractionAppScreen(
+    @StringRes
+    val title: Int
+) {
+    Start(R.string.app_name),
+    Details(R.string.app_name)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AttractionApp(
+    viewModel: AttractionViewModel = viewModel(),
+    navController: NavHostController = rememberNavController()
+) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    val windowSize: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+
+    var contentLayout: AttractionLayout
+
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = topAppBarColors(
+                    containerColor = Purple80,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
+                title = {
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Color.Black
+
+                    )
+                },
+            )
+        },
+        modifier = Modifier
+            .fillMaxSize()
+
+    ) { innerPadding ->
+        contentLayout = when (windowSize.windowWidthSizeClass) {
+            WindowWidthSizeClass.EXPANDED ->
+                AttractionLayout.HORIZONTAL
+
+            else -> AttractionLayout.VERTICAL
+        }
+
+
+        NavHost(
+            navController = navController,
+            startDestination = AttractionAppScreen.Start.name,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(AttractionAppScreen.Start.name) {
+                AttractionList(
+                    attractionList = uiState.attractionList,
+                    focussedAttraction = uiState.focussedAttraction,
+                    modifier = Modifier,
+                    contentLayout = contentLayout,
+                    viewModel = viewModel,
+                    onClick = {
+
+                        navController.navigate(AttractionAppScreen.Details.name)
+                    }
+
+                )
+            }
+            composable(AttractionAppScreen.Details.name) {
+                AttractionDetails(
+                    focussedAttraction = uiState.focussedAttraction,
+                    contentLayout = contentLayout,
+                    modifier = Modifier
+                )
+            }
+        }
+
+    }
+}
 
 @Composable
 fun AttractionList(
     attractionList: List<Attraction>,
     focussedAttraction: Attraction,
     contentLayout: AttractionLayout,
+    viewModel: AttractionViewModel,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -60,8 +158,11 @@ fun AttractionList(
             items(attractionList) { attraction ->
                 AttractionListItemSmallScreens(
                     attraction = attraction,
-                    focussedAttraction = focussedAttraction,
-                    onClick = {},
+                    onClick = {
+                        viewModel.selectFocussedAttraction(attraction)
+                        onClick()
+
+                    },
                 )
             }
         }
@@ -81,8 +182,10 @@ fun AttractionList(
 
                 AttractionListItemLargeScreens(
                     attraction = attraction,
-                    focussedAttraction = focussedAttraction,
-                    onClick = {},
+                    onClick = {
+                        viewModel.selectFocussedAttraction(attraction)
+                        onClick()
+                    },
                 )
 
             }
@@ -91,16 +194,34 @@ fun AttractionList(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar(
+    focussedAttraction: Attraction
+) {
+    CenterAlignedTopAppBar(
+        colors = topAppBarColors(
+            containerColor = Purple80,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = {
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.displaySmall,
+                color = Color.Black
+
+            )
+        },
+    )
+}
+
 @Composable
 fun AttractionListItemSmallScreens(
     attraction: Attraction,
     modifier: Modifier = Modifier,
-    focussedAttraction: Attraction,
     onClick: () -> Unit,
 ) {
-
     val height = 180.dp
-
 
     Card(
         modifier = modifier,
@@ -110,7 +231,7 @@ fun AttractionListItemSmallScreens(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(if (attraction == focussedAttraction) Purple40 else Purple80)
+                .background(Purple80)
         ) {
             Image(
                 painter = painterResource(attraction.img),
@@ -134,14 +255,14 @@ fun AttractionListItemSmallScreens(
                     style = MaterialTheme.typography.titleLarge,
                     textDecoration = TextDecoration.Underline,
                     fontWeight = FontWeight.Bold,
-                    color = if (attraction == focussedAttraction) Color.White else Color.Black
+                    color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(attraction.description),
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    color = if (attraction == focussedAttraction) Color.White else Color.Black
+                    color = Color.Black
 
                 )
             }
@@ -152,7 +273,6 @@ fun AttractionListItemSmallScreens(
 @Composable
 fun AttractionListItemLargeScreens(
     attraction: Attraction,
-    focussedAttraction: Attraction,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -163,7 +283,7 @@ fun AttractionListItemLargeScreens(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .background(if (attraction == focussedAttraction) Purple40 else Purple80)
+                .background(Purple80)
         ) {
             Image(
                 painter = painterResource(attraction.img),
@@ -177,15 +297,17 @@ fun AttractionListItemLargeScreens(
                 style = MaterialTheme.typography.titleLarge,
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
-                color = if (attraction == focussedAttraction) Color.White else Color.Black,
+                color = Color.Black,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             Text(
                 text = stringResource(attraction.description),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                color = if (attraction == focussedAttraction) Color.White else Color.Black,
-                modifier = Modifier.padding(16.dp)
+                color = Color.Black,
+                modifier = Modifier.padding(16.dp),
+                style = MaterialTheme.typography.bodyLarge
+
 
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -194,97 +316,6 @@ fun AttractionListItemLargeScreens(
     }
 }
 
-@Composable
-fun AttractionDetails(
-    focussedAttraction: Attraction,
-    isListView: Boolean,
-    modifier: Modifier = Modifier
-) {
-
-    return if (isListView) {
-        AttractionDetailsSmallScreens(
-            focussedAttraction = focussedAttraction,
-            modifier = modifier
-        )
-    } else {
-        AttractionDetailsLargeScreens(
-            focussedAttraction = focussedAttraction,
-            modifier = modifier
-        )
-    }
-
-}
-
-@Composable
-fun AttractionDetailsLargeScreens(
-    focussedAttraction: Attraction,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(focussedAttraction.img),
-            contentDescription = stringResource(focussedAttraction.name),
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.weight(1f)
-        )
-        Spacer(Modifier.height(12.dp))
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Text(
-                text = stringResource(focussedAttraction.name),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(focussedAttraction.description),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 8.dp)
-
-            )
-
-        }
-    }
-}
-
-@Composable
-fun AttractionDetailsSmallScreens(
-    focussedAttraction: Attraction,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ) {
-        Image(
-            painter = painterResource(focussedAttraction.img),
-            contentDescription = stringResource(focussedAttraction.name),
-            contentScale = ContentScale.Inside
-        )
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = stringResource(focussedAttraction.name),
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(horizontal = 8.dp)
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = stringResource(focussedAttraction.description),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 8.dp)
-
-        )
-    }
-}
 
 //@Preview(showBackground = true)
 //@Composable
@@ -292,30 +323,24 @@ fun AttractionDetailsSmallScreens(
 //    VisitSomersetTheme {
 //        AttractionList(
 //            LocalAttractionsData.getListOfAttractions(),
-//            focussedAttraction = LocalAttractionsData.firstAttraction
-//        )
-//    }
-//}
-//
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AttractionListItemPreview() {
-//    VisitSomersetTheme {
-//        AttractionListItem(
-//            LocalAttractionsData.firstAttraction,
 //            focussedAttraction = LocalAttractionsData.firstAttraction,
-//            onClick = {})
-//    }
-//}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AttractionDetailsPreview() {
-//    VisitSomersetTheme {
-//        AttractionDetails(
-//            LocalAttractionsData.firstAttraction,
-//            isListView = true
+//            contentLayout = AttractionLayout.VERTICAL,
+//            viewModel: AttractionViewModel = viewModel(),
 //        )
 //    }
 //}
+
+
+@Preview(showBackground = true)
+@Composable
+fun AttractionListItemPreview() {
+    VisitSomersetTheme {
+        AttractionListItemLargeScreens(
+            LocalAttractionsData.firstAttraction,
+            onClick = {}
+        )
+    }
+}
+
+
+
