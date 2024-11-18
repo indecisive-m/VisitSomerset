@@ -18,9 +18,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
@@ -72,36 +77,32 @@ fun AttractionApp(
 
     val windowSize: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    var contentLayout: AttractionLayout
+    var contentLayout: AttractionLayout = when (windowSize.windowWidthSizeClass) {
+        WindowWidthSizeClass.EXPANDED ->
+            AttractionLayout.HORIZONTAL
+
+        else -> AttractionLayout.VERTICAL
+    }
+
+    val backStackEntry by navController.currentBackStackEntryAsState()
+
+    val currentScreen = AttractionAppScreen.valueOf(
+        backStackEntry?.destination?.route ?: AttractionAppScreen.Start.name
+    )
+
 
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                colors = topAppBarColors(
-                    containerColor = Purple80,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                title = {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.displaySmall,
-                        color = Color.Black
-
-                    )
+            TopAppBar(
+                focussedAttraction = currentScreen,
+                canGoBack = navController.previousBackStackEntry != null,
+                goBack = {
+                    navController.navigateUp()
                 },
             )
-        },
-        modifier = Modifier
-            .fillMaxSize()
-
-    ) { innerPadding ->
-        contentLayout = when (windowSize.windowWidthSizeClass) {
-            WindowWidthSizeClass.EXPANDED ->
-                AttractionLayout.HORIZONTAL
-
-            else -> AttractionLayout.VERTICAL
         }
+    ) { innerPadding ->
 
 
         NavHost(
@@ -197,7 +198,10 @@ fun AttractionList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBar(
-    focussedAttraction: Attraction
+    focussedAttraction: AttractionAppScreen,
+    goBack: () -> Unit,
+    canGoBack: Boolean,
+    modifier: Modifier = Modifier
 ) {
     CenterAlignedTopAppBar(
         colors = topAppBarColors(
@@ -205,13 +209,23 @@ fun TopAppBar(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
         title = {
+
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.displaySmall,
                 color = Color.Black
-
             )
         },
+        navigationIcon = {
+            if (canGoBack) {
+                IconButton(onClick = goBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                        contentDescription = "Go Back"
+                    )
+                }
+            }
+        }
     )
 }
 
@@ -279,7 +293,10 @@ fun AttractionListItemLargeScreens(
 
     val height = 300.dp
 
-    Card(modifier = modifier) {
+    Card(
+        modifier = modifier,
+        onClick = onClick
+    ) {
         Column(
             modifier = modifier
                 .fillMaxSize()
